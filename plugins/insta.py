@@ -1,4 +1,6 @@
 import logging
+from pyrogram import Client, filters
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
