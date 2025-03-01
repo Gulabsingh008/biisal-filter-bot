@@ -6,6 +6,9 @@ import traceback
 import random
 from pyrogram import Client, filters
 from info import LOG_CHANNEL as DUMP_GROUP
+import instaloader
+from datetime import date
+from concurrent.futures import ThreadPoolExecutor
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:105.0) Gecko/20100101 Firefox/105.0",
@@ -89,3 +92,41 @@ async def link_handler(Mbot, message):
         if 'downfile' in locals():
             os.remove(downfile)
         await message.reply("<a href='https://t.me/af'>af</a>")
+
+def download_user_reels(username: str, start_date: date, end_date: date, output_dir: str):
+    downloader = instaloader.Instaloader(dirname_pattern=output_dir)
+
+    try:
+        profile = instaloader.Profile.from_username(downloader.context, username)
+        downloader.download_profilepic(profile)
+        print(f"foto de perfil de @{username} obtenida 📸")
+
+        print(f"🔍 Buscando reels de @{username} entre {start_date.isoformat()} y {end_date.isoformat()}...")
+
+        downloaded_count = 0
+        reels = [
+            post
+            for post in profile.get_posts()
+            if post.is_video
+            and post.typename == "Reel"
+            and start_date <= post.date <= end_date
+        ]
+
+        for post in profile.get_posts():
+            if downloader.download_post(post, target=f"{output_dir}/{username}_reels"):
+                downloaded_count += 1
+            print(f"✅ Descargado: {post.date.strftime('%Y-%m-%d')} - {post.title}")
+
+        print(f"\n @{username}: Descarga completada. Total de reels descargados: {downloaded_count}/{len(reels)}")
+
+    except instaloader.exceptions.ProfileNotExistsException:
+        print(f"❌ Error: El usuario @{username} no existe")
+    except Exception as e:
+        print(f"❌ Error inesperado: {str(e)}")
+
+def multidownload(users: list[str], start_date: date, end_date: date, output_dir: str, limit: int) -> None:
+    with ThreadPoolExecutor(max_workers=limit) as pool:
+        for user in users:
+            _ = pool.submit(download_user_reels, user, start_date, end_date, output_dir)
+
+    print("Finalizado con exito ✅")
