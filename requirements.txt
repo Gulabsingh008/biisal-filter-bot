@@ -1,4 +1,6 @@
 pyrofork==2.3.45
+
+instaloader
 tgcrypto
 pymongo[srv]==4.8.0
 motor==3.5.1
