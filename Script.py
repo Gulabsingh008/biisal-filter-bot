@@ -116,13 +116,15 @@ User - {}"""
 ❗️ ʟᴀɴɢᴜᴀɢᴇ - {languages}</b>
 """
 
-    FILE_CAPTION = """<b>📂Fɪʟᴇɴᴀᴍᴇ : {file_name}</b>
+    FILE_CAPTION = """<b><blockquote><a href="">@Reelify_Bot{file_name}}</a></blockquote>
 
-<b> Size ⚙️: {file_size}
-○Jᴏɪɴ :<a href="https://t.me/AF_Mhakal">Cʜᴀɴɴᴇʟ</a>
-○Mᴏᴠɪᴇ : :<a href="https://t.me/AF_Mhakal">Gʀᴏᴜᴘ</a>
+⊱───── ❝  𝓙𝓸𝓲𝓷 𝓝𝓸𝔀 ❞ ─────⊰
+<blockquote>○Jᴏɪɴ :<a href="https://t.me/">Cʜᴀɴɴᴇʟ</a>
+○Mᴏᴠɪᴇ : :<a href="https://t.me/">Gʀᴏᴜᴘ</a></blockquote>
 </b>""" 
 
+
+    
     RESTART_TXT = """<b>
 📅 Dᴀᴛᴇ : <code>{}</code>
 ⏰ Tɪᴍᴇ : <code>{}</code>
