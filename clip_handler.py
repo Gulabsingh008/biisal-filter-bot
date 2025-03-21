@@ -1,6 +1,6 @@
 from pyrogram import Client, filters
-import random
 import os
+import random
 import subprocess
 
 CLIP_DIR = "clips"
@@ -16,36 +16,44 @@ async def process_video(client, message):
         await message.reply("कृपया एक वीडियो भेजें!")
         return
 
+    # वीडियो डाउनलोड करें
     video_path = await message.download()
-    output_path = f"sample_{video_path}"
+    clip_filename = os.path.join(CLIP_DIR, f"clip_{random.randint(1000, 9999)}.mp4")
 
     # Debugging Message
     print(f"✅ Video Received: {video_path}")
 
-    # FFmpeg Command to Extract 60-sec Clip from Middle
-    duration_cmd = f"ffprobe -i {video_path} -show_entries format=duration -v quiet -of csv='p=0'"
-    duration = float(subprocess.getoutput(duration_cmd))
-    
-    if duration < 60:
-        await message.reply("वीडियो 60 सेकंड से छोटा है!")
+    # FFmpeg से वीडियो की Duration निकालें
+    duration_cmd = f"ffprobe -i \"{video_path}\" -show_entries format=duration -v quiet -of csv=\"p=0\""
+    duration_output = subprocess.getoutput(duration_cmd)
+
+    try:
+        duration = float(duration_output.strip())
+    except ValueError:
+        await message.reply("🚫 Error: Unable to get video duration!")
         return
 
-    start_time = int(duration / 2) - 30  # वीडियो के बीच से 60 सेकंड निकालने के लिए
+    if duration < 60:
+        await message.reply("वीडियो 60 सेकंड से छोटा है!")
+        os.remove(video_path)  # Unused file delete करें
+        return
 
-    cmd = f"ffmpeg -i {video_path} -ss {start_time} -t 60 -c copy {output_path}"
-    subprocess.run(cmd, shell=True)
+    # वीडियो के बीच से 60 सेकंड की क्लिप निकालने के लिए Start Time सेट करें
+    start_time = max(0, int(duration / 2) - 30)  
+
+    # FFmpeg Command to Extract 60-sec Clip
+    cmd = f"ffmpeg -i \"{video_path}\" -ss {start_time} -t 60 -c copy \"{clip_filename}\""
+    subprocess.run(cmd, shell=True, check=True)
 
     # Debugging Message
-    print(f"🎥 Clipping Done: {output_path}")
+    print(f"🎥 Clipping Done: {clip_filename}")
 
     # अब बॉट क्लिप भेजेगा
-    await message.reply_video(output_path, caption="Here is your 60-sec sample clip!")
+    await message.reply_video(clip_filename, caption="🎥 Here is your 60-sec sample clip!")
 
     # Debugging Message
     print("✅ Clip Sent Successfully!")
 
-    with open(clip_filename, "rb") as clip:
-        await message.reply_video(clip, caption="🎥 Here is your 60-sec sample clip!")
-
-    os.remove(file_path)
+    # क्लिप और ओरिजिनल वीडियो को डिलीट करें
+    os.remove(video_path)
     os.remove(clip_filename)
