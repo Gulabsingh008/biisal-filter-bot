@@ -2,7 +2,7 @@ import re
 import os
 from os import environ
 from Script import script
-from clip_handler import *  # Import Clip Feature
+
 
 
 id_pattern = re.compile(r'^.\d+$')
