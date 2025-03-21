@@ -49,7 +49,7 @@ async def process_video(client, message):
     print(f"🎥 Clipping Done: {clip_filename}")
 
     # अब बॉट क्लिप भेजेगा
-    await message.reply_video(clip_filename, caption="🎥 Here is your 60-sec sample clip!")
+    await message.reply_video(clip_filename, caption=f" 📁 '{file_name}' 🎥 Here is your 60-sec sample clip!")
 
     # Debugging Message
     print("✅ Clip Sent Successfully!")
