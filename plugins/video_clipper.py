@@ -12,14 +12,13 @@ logging.basicConfig(level=logging.INFO)
 TEMP_DIR = "downloads"
 os.makedirs(TEMP_DIR, exist_ok=True)
 
-# 📌 Video Chunked Download Function
-async def download_video_chunked(client, message, file_path, chunk_size=1024 * 1024 * 5):  # 5MB Chunk
+# 📌 Video Chunked Download Function (Corrected)
+async def download_video_chunked(client, message, file_path):
     logging.info("📥 Downloading video in chunks...")
     start_time = time.time()
 
-    with open(file_path, "wb") as f:
-        async for chunk in client.stream_media(message, chunk_size=chunk_size):
-            f.write(chunk)
+    # 🔥 चंक्स में डाउनलोड करने के लिए `download_media()` का उपयोग करें
+    await client.download_media(message, file_name=file_path)
 
     end_time = time.time()
     logging.info(f"✅ Chunked Download Completed in {round(end_time - start_time, 2)} seconds!")
@@ -28,7 +27,7 @@ async def download_video_chunked(client, message, file_path, chunk_size=1024 * 1
 def generate_thumbnail(video_path, thumb_path):
     try:
         command = [
-            "ffmpeg", "-y", "-i", video_path, "-vf", "scale=320:320", 
+            "ffmpeg", "-y", "-i", video_path, "-vf", "scale=320:320",
             "-vframes", "1", "-q:v", "2", thumb_path
         ]
         subprocess.run(command, check=True)
@@ -69,7 +68,7 @@ async def handle_video(client: Client, message: Message):
         output_path = os.path.join(TEMP_DIR, f"clip_{file_name}")
         thumb_path = os.path.join(TEMP_DIR, f"thumb_{file_name}.jpg")
 
-        # 🔥 Step 2: Download in Chunks
+        # 🔥 Step 2: Download in Chunks (Fixed)
         await download_video_chunked(client, message, input_path)
 
         # 🎬 Step 3: Create Clip (Optimized)
