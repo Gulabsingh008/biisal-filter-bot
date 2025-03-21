@@ -12,6 +12,18 @@ logging.basicConfig(level=logging.INFO)
 TEMP_DIR = "downloads"
 os.makedirs(TEMP_DIR, exist_ok=True)
 
+# 📌 Video Chunked Download Function
+async def download_video_chunked(client, message, file_path, chunk_size=1024 * 1024 * 5):  # 5MB Chunk
+    logging.info("📥 Downloading video in chunks...")
+    start_time = time.time()
+
+    with open(file_path, "wb") as f:
+        async for chunk in client.stream_media(message, chunk_size=chunk_size):
+            f.write(chunk)
+
+    end_time = time.time()
+    logging.info(f"✅ Chunked Download Completed in {round(end_time - start_time, 2)} seconds!")
+
 # 📌 Generate Thumbnail from Video
 def generate_thumbnail(video_path, thumb_path):
     try:
@@ -50,24 +62,22 @@ async def create_clip(input_file, output_file, start_time="00:10:00", duration="
 @Client.on_message(filters.video)
 async def handle_video(client: Client, message: Message):
     try:
-        # 🔥 Step 1: Download Video (Original Name से)
-        logging.info("📥 Downloading video...")
-        start = time.time()
+        # 🔥 Step 1: Get File Name
+        logging.info("📥 Downloading video in chunks...")
         file_name = message.video.file_name if message.video.file_name else f"{message.video.file_id}.mp4"
         input_path = os.path.join(TEMP_DIR, file_name)
         output_path = os.path.join(TEMP_DIR, f"clip_{file_name}")
         thumb_path = os.path.join(TEMP_DIR, f"thumb_{file_name}.jpg")
 
-        await client.download_media(message.video, file_name=input_path)
-        end = time.time()
-        logging.info(f"✅ Download Completed in {round(end - start, 2)} seconds!")
+        # 🔥 Step 2: Download in Chunks
+        await download_video_chunked(client, message, input_path)
 
-        # 🎬 Step 2: Create Clip (Optimized)
+        # 🎬 Step 3: Create Clip (Optimized)
         if await create_clip(input_path, output_path):
-            # 📸 Step 3: Generate Thumbnail
+            # 📸 Step 4: Generate Thumbnail
             generate_thumbnail(output_path, thumb_path)
 
-            # 🚀 Step 4: Send Clipped Video with Custom Thumbnail
+            # 🚀 Step 5: Send Clipped Video with Custom Thumbnail
             logging.info("📤 Sending clipped video...")
             caption = message.caption if message.caption else "🎬 Clipped Video"
             await client.send_video(
