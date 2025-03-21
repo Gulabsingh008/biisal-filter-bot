@@ -13,6 +13,7 @@ wget
 aiofiles
 ffmpeg-python
 ffmpeg
+yt-dlp
 requests
 aiohttp
 telegraph
