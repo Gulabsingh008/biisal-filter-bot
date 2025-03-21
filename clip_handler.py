@@ -11,8 +11,6 @@ async def clip_command(client, message):
     await message.reply("📩 Send a video to extract a 60-sec random clip.")
 
 @Client.on_message(filters.video & filters.private)
-import subprocess
-
 async def process_video(client, message):
     if not message.video:
         await message.reply("कृपया एक वीडियो भेजें!")
