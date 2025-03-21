@@ -23,11 +23,11 @@ async def download_video_chunked(client, message, file_path):
     end_time = time.time()
     logging.info(f"✅ Chunked Download Completed in {round(end_time - start_time, 2)} seconds!")
 
-# 📌 Generate Thumbnail from Video
+# 📌 Generate Correct Aspect Ratio Thumbnail from Video
 def generate_thumbnail(video_path, thumb_path):
     try:
         command = [
-            "ffmpeg", "-y", "-i", video_path, "-vf", "scale=320:320",
+            "ffmpeg", "-y", "-i", video_path, "-vf", "scale=320:-1",  # ✅ Auto Height (Maintains Aspect Ratio)
             "-vframes", "1", "-q:v", "2", thumb_path
         ]
         subprocess.run(command, check=True)
@@ -35,6 +35,7 @@ def generate_thumbnail(video_path, thumb_path):
     except Exception as e:
         logging.error(f"❌ Thumbnail Generation Error: {e}")
         return None
+
 
 # 📌 Optimized FFmpeg Clipping Function
 async def create_clip(input_file, output_file, start_time="00:10:00", duration="30"):
