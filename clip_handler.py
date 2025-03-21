@@ -1,7 +1,7 @@
 from pyrogram import Client, filters
 import os
-import random
 import subprocess
+import yt_dlp
 
 CLIP_DIR = "clips"
 os.makedirs(CLIP_DIR, exist_ok=True)
@@ -16,44 +16,68 @@ async def process_video(client, message):
         await message.reply("कृपया एक वीडियो भेजें!")
         return
 
-    # वीडियो डाउनलोड करें
     video_path = await message.download()
-    clip_filename = os.path.join(CLIP_DIR, f"clip_{random.randint(1000, 9999)}.mp4")
+    file_name = os.path.basename(video_path)  # Extract only the filename
+    output_path = f"clip_{file_name}"
 
-    # Debugging Message
     print(f"✅ Video Received: {video_path}")
 
-    # FFmpeg से वीडियो की Duration निकालें
-    duration_cmd = f"ffprobe -i \"{video_path}\" -show_entries format=duration -v quiet -of csv=\"p=0\""
+    # Get video duration
+    duration_cmd = f"ffprobe -i {video_path} -show_entries format=duration -v quiet -of csv='p=0'"
     duration_output = subprocess.getoutput(duration_cmd)
 
     try:
-        duration = float(duration_output.strip())
+        duration = float(duration_output)
     except ValueError:
         await message.reply("🚫 Error: Unable to get video duration!")
         return
 
     if duration < 60:
-        await message.reply("वीडियो 60 सेकंड से छोटा है!")
-        os.remove(video_path)  # Unused file delete करें
+        await message.reply("🚫 Error: Video is shorter than 60 seconds!")
         return
 
-    # वीडियो के बीच से 60 सेकंड की क्लिप निकालने के लिए Start Time सेट करें
-    start_time = max(0, int(duration / 2) - 30)  
+    start_time = int(duration / 2) - 30
 
-    # FFmpeg Command to Extract 60-sec Clip
-    cmd = f"ffmpeg -i \"{video_path}\" -ss {start_time} -t 60 -c copy \"{clip_filename}\""
-    subprocess.run(cmd, shell=True, check=True)
+    cmd = f"ffmpeg -i {video_path} -ss {start_time} -t 60 -c copy {output_path}"
+    subprocess.run(cmd, shell=True)
 
-    # Debugging Message
-    print(f"🎥 Clipping Done: {clip_filename}")
+    print(f"🎥 Clipping Done: {output_path}")
 
-    # अब बॉट क्लिप भेजेगा
-    await message.reply_video(clip_filename, caption=f" 📁 '{file_name}' 🎥 Here is your 60-sec sample clip!")
+    await message.reply_video(output_path, caption=f"📁 `{file_name}`")
+    await message.reply("✅ Process Completed Successfully!")
 
-    # Debugging Message
-    print("✅ Clip Sent Successfully!")
-
-    # क्लिप और ओरिजिनल वीडियो को डिलीट करें
     os.remove(video_path)
-    os.remove(clip_filename)
+    os.remove(output_path)
+
+
+# ✅ YOUTUBE VIDEO DOWNLOAD FEATURE ✅
+@Client.on_message(filters.command("yt") & filters.private)
+async def download_youtube_video(client, message):
+    if len(message.command) < 2:
+        await message.reply("🚫 Please provide a YouTube link! Example: `/yt <url>`")
+        return
+
+    url = message.command[1]
+    await message.reply("📥 Downloading YouTube video...")
+
+    ydl_opts = {
+        'outtmpl': 'downloads/%(title)s.%(ext)s',
+        'format': 'bestvideo+bestaudio/best',
+        'merge_output_format': 'mp4',
+    }
+
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        try:
+            info = ydl.extract_info(url, download=True)
+            file_path = ydl.prepare_filename(info)
+            file_name = os.path.basename(file_path)
+        except Exception as e:
+            await message.reply(f"🚫 Error: {e}")
+            return
+
+    print(f"✅ YouTube Downloaded: {file_path}")
+
+    await message.reply_video(file_path, caption=f"📁 `{file_name}`")
+    await message.reply("✅ YouTube Video Downloaded Successfully!")
+
+    os.remove(file_path)
