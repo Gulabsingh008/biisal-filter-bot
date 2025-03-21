@@ -7,8 +7,12 @@ from pyrogram.types import Message
 # 🔥 लॉगिंग सेटअप
 logging.basicConfig(level=logging.INFO)
 
+# 📌 Temporary Directory
+TEMP_DIR = "downloads"
+os.makedirs(TEMP_DIR, exist_ok=True)
+
 # 📌 FFmpeg क्लिपिंग फंक्शन
-async def create_clip(input_file, output_file, start_time="00:00:10", duration="30"):
+async def create_clip(input_file, output_file, start_time="00:10:00", duration="30"):
     try:
         logging.info(f"🎬 Clipping Video: {input_file} -> {output_file}")
         command = [
@@ -26,10 +30,11 @@ async def create_clip(input_file, output_file, start_time="00:00:10", duration="
 @Client.on_message(filters.video)
 async def handle_video(client: Client, message: Message):
     try:
-        # 🔥 Step 1: Download Video
+        # 🔥 Step 1: Download Video (Original Name से)
         logging.info("📥 Downloading video...")
-        input_path = f"downloads/{message.video.file_id}.mp4"
-        output_path = "clip.mp4"
+        file_name = message.video.file_name if message.video.file_name else f"{message.video.file_id}.mp4"
+        input_path = os.path.join(TEMP_DIR, file_name)
+        output_path = os.path.join(TEMP_DIR, f"clip_{file_name}")
 
         await client.download_media(message.video, file_name=input_path)
 
