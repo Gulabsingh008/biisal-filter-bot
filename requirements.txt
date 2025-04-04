@@ -1,4 +1,7 @@
 pyrofork==2.3.45
+aiogram==2.25.1
+#pymongo[srv]==4.6.1
+asyncio==3.4.3
 
 instaloader
 tgcrypto
