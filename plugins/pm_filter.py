@@ -34,7 +34,7 @@ async def pm_search(client, message):
         await auto_filter(client, message , pm_mode=True)
     else:
         await message.reply_text(
-        text=f"<b>Hey, {message.from_user.mention} you are not a premium user, so you can't search for movies in PM.</b>",
+        text=f"<b>Hey, {message.from_user.mention} 👉 Please use the **Movie Search Group** below to search for movies/series. Direct search in PM is only available for premium users.</b>",
         reply_markup=InlineKeyboardMarkup([
                 [InlineKeyboardButton('Buy Premium', callback_data='seeplans')],
                 [InlineKeyboardButton("📝 ᴍᴏᴠɪᴇ ꜱᴇᴀʀᴄʜ ɢʀᴏᴜᴘ✨", url='https://t.me/+JdRUqgm9Xvk3MWJl')]
@@ -1601,4 +1601,5 @@ async def advantage_spell_chok(message):
         await message.delete()
     except:
         pass
+
 
