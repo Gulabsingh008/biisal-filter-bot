@@ -1,11 +1,11 @@
 class script(object):
-    START_TXT = """<b>🎭 ᴊᴀɪ sʜʀᴇᴇ ᴋʀɪsʜɴᴀ ♕ {}
+    START_TXT = """<b><blockquote>🎭 ᴊᴀɪ sʜʀᴇᴇ ᴋʀɪsʜɴᴀ ♕ {}</blockquote>
 
-<blockquote> Send any movie/series name and I'll find it for you. ✨</blockquote>
+ Just send me the name of any movie or series, and this bot will automatically search and find it for you. ✨
+ <blockquote>मूवी या सीरीज़ का नाम भेजो, बॉट आपको तुरंत खोजकर दे देगा। ✨</blockquote>
 
-
+<blockquote><b>ᴍᴀɪɴᴛᴀɪɴᴇᴅ ʙʏ :</b> <a href='https://telegram.me/'>ᴀғ ᴍʜᴀᴋᴀʟ</a></blockquote>
 <blockquote>ᴛᴀᴘ ʙᴜᴛᴛᴏɴs ʙᴇʟᴏᴡ ғᴏʀ ᴍᴏʀᴇ 👇</blockquote>
-<b>ᴍᴀɪɴᴛᴀɪɴᴇᴅ ʙʏ :</b> <a href='https://telegram.me/'>ᴀғ ᴍʜᴀᴋᴀʟ</a>
 
 </b>"""
     
@@ -287,5 +287,6 @@ Description: {description}
 
 {file_name}
 </b>"""
+
 
 
