@@ -34,10 +34,10 @@ async def pm_search(client, message):
         await auto_filter(client, message , pm_mode=True)
     else:
         await message.reply_text(
-        text=f"<b>Hey, {message.from_user.mention} 👉 Please use the **Movie Search Group** below to search for movies/series. Direct search in PM is only available for premium users.</b>",
+        text=f"<b>Hey, {message.from_user.mention} 👉 Please use the **Movie Search Group** below to search for movies/series. Direct search in PM is only available for premium users.\nhttps://t.me/+JdRUqgm9Xvk3MWJl\nhttps://t.me/+JdRUqgm9Xvk3MWJl</b>",
         reply_markup=InlineKeyboardMarkup([
-                [InlineKeyboardButton('Buy Premium', callback_data='seeplans')],
-                [InlineKeyboardButton("📝 ᴍᴏᴠɪᴇ ꜱᴇᴀʀᴄʜ ɢʀᴏᴜᴘ✨", url='https://t.me/+JdRUqgm9Xvk3MWJl')]
+               # [InlineKeyboardButton('Buy Premium', callback_data='seeplans')],
+                [InlineKeyboardButton("📝 Movie Search Group✨", url='https://t.me/+JdRUqgm9Xvk3MWJl')]
             ]))
         await client.send_message(
             chat_id=LOG_CHANNEL,
@@ -1602,6 +1602,7 @@ async def advantage_spell_chok(message):
         await message.delete()
     except:
         pass
+
 
 
 
